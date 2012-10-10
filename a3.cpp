@@ -8,6 +8,7 @@ void esriParse::loadFile(string fname){
   string elmnt; //elmnt to be inserted
   string onw; //elmnt alt(testing)
   int lcount = 0; //limit line output
+  string nopoint;
   ifstream file (fname.c_str());
   
   if (file.is_open())
@@ -17,6 +18,10 @@ void esriParse::loadFile(string fname){
       getline(file, line);
       if (line == "") continue;
 
+      if(lcount==5 && !isdigit(line[0])){
+        nopoint = line.substr(line.find_first_of(' ')+1);
+        continue;
+      }
       if (lcount < 2){ //grab meta data
         onw = line.substr(line.find_first_of(' ')+1);
         rowCol[rc]=atoi(onw.c_str());
@@ -31,9 +36,10 @@ void esriParse::loadFile(string fname){
           ind = line.find_first_of(' ', prev);
 
           elmnt = line.substr(prev, ind-prev);
-
-          data.push_back(atof(elmnt.c_str()));
-          ++elcount;
+          if(elmnt!= nopoint){
+            data.push_back(atof(elmnt.c_str()));
+            ++elcount;
+          }
 
           prev=ind+1;
         }
